@@ -242,7 +242,18 @@ find_dirs() {
             path="$entry"
         fi
 
-        [[ -d "$path" ]] && find "$path" -mindepth 1 -maxdepth "${depth:-${TS_MAX_DEPTH:-1}}" -path '*/.git' -prune -o -type d -print
+        if [[ -d "$path" ]]; then
+          if [[ "$depth" == "0" ]]; then
+            # Depth 0 → only that directory itself, no recursion
+            echo "$path"
+          else
+            # Use either the explicit depth, TS_MAX_DEPTH, or default 1
+            find "$path" \
+              -mindepth 1 \
+              -maxdepth "${depth:-${TS_MAX_DEPTH:-1}}" \
+              -path '*/.git' -prune -o -type d -print
+          fi
+        fi
     done
 }
 
